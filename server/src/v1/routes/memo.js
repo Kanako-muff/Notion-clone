@@ -14,5 +14,8 @@ router.get("/:memoId", tokenHandler.verifyToken, memoController.getOne);
 //Updating a memo of the login user.
 router.put("/:memoId", tokenHandler.verifyToken, memoController.update);
 
+//Deleting a memo of the login user.
+router.delete("/:memoId", tokenHandler.verifyToken, memoController.delete);
+
 
 module.exports = router;
