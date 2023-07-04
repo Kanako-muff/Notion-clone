@@ -1,23 +1,50 @@
 import { Box, Drawer, IconButton, List, ListItemButton, Typography } from '@mui/material'
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined"
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import assets from '../../assets/index';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import memoApi from '../../api/memoApi';
+import { setMemo } from "../../redux/features/memoSlice";
 
 const Sidebar = () => {
-    //Getting user info with userSlice.
+    const [activeIndex, setActiveIndex] = useState(0);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { memoId } = useParams();
+
+    //Getting user info
     const user = useSelector((state) => state.user.value);
 
-    //Logout (just removing JWT token and redirect to login)
-    const navigate = useNavigate();
+    //Getting memo info
+    const memos = useSelector((state) => state.memo.value);
 
+    //Logout (just removing JWT token and redirect to login)
     const logout = () => {
         localStorage.removeItem("token");
         navigate("/login");
     };
+
+    //Showing created memos on the sidebar.
+    useEffect(() => {
+        const getMemos = async() => {
+            try {
+                const res = await memoApi.getAll();
+                dispatch(setMemo(res));
+            } catch (err) {
+                alert(err);
+            }
+        };
+        getMemos();
+    }, [dispatch]);
+
+    //Highlighting the selected memo
+    useEffect(() => {
+        const activeIndex = memos.findIndex((e) => e._id === memoId);
+        setActiveIndex(activeIndex);
+    }, [navigate]);
 
   return (
     <Drawer 
@@ -61,7 +88,7 @@ const Sidebar = () => {
                     }}
                 >
                     <Typography variant="body2" fontWeight="700">
-                        Favorite
+                        Bookmark
                     </Typography>
                 </Box>
             </ListItemButton>
@@ -83,27 +110,19 @@ const Sidebar = () => {
                     </IconButton>
                 </Box>
             </ListItemButton>
-            <ListItemButton
-                sx={{ pl: "20px" }} 
-                component={Link} 
-                to="/memo/123123123"
-            >
-                <Typography>📝 temp memo</Typography>
-            </ListItemButton>
-            <ListItemButton
-                sx={{ pl: "20px" }} 
-                component={Link} 
-                to="/memo/123123123"
-            >
-                <Typography>📝 temp memo</Typography>
-            </ListItemButton>
-            <ListItemButton
-                sx={{ pl: "20px" }} 
-                component={Link} 
-                to="/memo/123123123"
-            >
-                <Typography>📝 temp memo</Typography>
-            </ListItemButton>
+            {memos.map((item, index) => (
+                <ListItemButton
+                    sx={{ pl: "20px" }} 
+                    component={Link} 
+                    to={`/memo/${item._id}`}
+                    key={item._id}
+                    selected={index === activeIndex}
+                >
+                    <Typography>
+                        {item.icon}{item.title}
+                    </Typography>
+                </ListItemButton>
+            ))}
         </List>
     </Drawer>
   );
