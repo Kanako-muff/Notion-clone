@@ -6,6 +6,7 @@ const User = require("../models/user"); //⬅︎ schema
 // Setting the combination of username and password
 exports.register = async (req, res) => {
     const password = req.body.password;
+    console.log(req.body.password);
 
     try {
         // Encrypt the PW with crypto-js

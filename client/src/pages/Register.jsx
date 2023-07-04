@@ -28,6 +28,12 @@ const Register = () => {
     // Validation checking
     let error = false;
 
+    console.log(data);
+    console.log(username);
+    console.log(password);
+    console.log(confirmPassword);
+
+
     if(username === ""){
       error = true;
       setUsernameErrText("Enter your name.")
@@ -57,6 +63,8 @@ const Register = () => {
         confirmPassword,
       });
 
+      console.log(res.data);
+
       //End loading
       setLoading(false);
       
@@ -68,6 +76,7 @@ const Register = () => {
 
     } catch (err) {
       console.log(err);
+      console.log(err.data);
       const errors = err.data.errors;
       console.log(errors);
       errors.forEach((e)=>{
